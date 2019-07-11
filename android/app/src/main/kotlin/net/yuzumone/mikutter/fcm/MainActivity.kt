@@ -1,4 +1,4 @@
-package net.yuzumone.mikutter.mikutter_fcm
+package net.yuzumone.mikutter.fcm
 
 import android.os.Bundle
 

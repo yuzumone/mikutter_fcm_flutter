@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 
 void main() => runApp(MyApp());
@@ -97,12 +99,24 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(16.0),
+        child: GestureDetector(
+          onTap: () {
+            var data = ClipboardData(text: _token);
+            Clipboard.setData(data);
+            Fluttertoast.showToast(
+              msg: 'Copy token',
+            );
+          },
+          child: Text(
+            _token,
+          ),
         ),
-        body: Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(_token),
-        ));
+      ),
+    );
   }
 }

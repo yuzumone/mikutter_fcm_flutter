@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
+import 'model/mikutter_message.dart';
 
 void main() => runApp(MyApp());
 
@@ -59,15 +60,18 @@ class _MyHomePageState extends State<MyHomePage> {
     _messaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         var data = message['data'];
-        var title = data['title'];
-        var body = data['body'];
+        var msg = MikutterMessage(
+          title: data['title'],
+          body: data['body'],
+          url: data['url'],
+        );
         var androidPlatformChannelSpecifics = AndroidNotificationDetails(
             'default', 'Notification', 'mikuter fcm notification');
         var iOSPlatformChannelSpecifics = IOSNotificationDetails();
         var platformChannelSpecifics = NotificationDetails(
             androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
         await flutterLocalNotificationsPlugin.show(
-            0, title, body, platformChannelSpecifics,
+            0, msg.title, msg.body, platformChannelSpecifics,
             payload: json.encode(data));
       },
       onLaunch: (Map<String, dynamic> message) async {},
@@ -93,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future onSelectNotification(String payload) async {
     if (payload != null) {
       var data = json.decode(payload);
+      var msg = MikutterMessage.fromMap(data);
     }
   }
 

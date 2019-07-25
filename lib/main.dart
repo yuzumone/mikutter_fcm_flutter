@@ -5,6 +5,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'model/mikutter_message.dart';
+import 'database/mikutter_message_provider.dart';
+
+final dbPath = 'mikutter_message_db';
 
 void main() => runApp(MyApp());
 
@@ -52,11 +55,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   FirebaseMessaging _messaging = new FirebaseMessaging();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  MikutterMessageProvider _provider = new MikutterMessageProvider();
   var _token = 'default';
 
   @override
   void initState() {
     super.initState();
+    _provider.open(dbPath);
     _messaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         var data = message['data'];
@@ -65,6 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
           body: data['body'],
           url: data['url'],
         );
+        _provider.insert(msg);
+        _provider.close();
         var androidPlatformChannelSpecifics = AndroidNotificationDetails(
             'default', 'Notification', 'mikuter fcm notification');
         var iOSPlatformChannelSpecifics = IOSNotificationDetails();

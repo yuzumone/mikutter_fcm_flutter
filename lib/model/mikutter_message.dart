@@ -1,4 +1,5 @@
 class MikutterMessage {
+  int id;
   String title;
   String body;
   String url;
@@ -16,10 +17,14 @@ class MikutterMessage {
   );
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      title: title,
-      body: body,
-      url: url,
+    var map = <String, dynamic> {
+      'title': title,
+      'body': body,
+      'url': url,
     };
+    if (id != null) {
+      map['id'] = id;
+    }
+    return map;
   }
 }

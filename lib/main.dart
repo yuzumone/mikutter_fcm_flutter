@@ -8,60 +8,52 @@ import 'model/mikutter_message.dart';
 import 'database/mikutter_message_provider.dart';
 
 final dbPath = 'mikutter_message_db';
+FirebaseMessaging _messaging;
+String _token = 'default';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
+      routes: <String, WidgetBuilder>{
+        '/settings': (_) => new SettingPage(title: 'Setting'),
+      },
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+class SettingPage extends StatefulWidget {
+  SettingPage({Key key, this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _SettingPageState createState() => _SettingPageState();
+}
+
 class _MyHomePageState extends State<MyHomePage> {
-  FirebaseMessaging _messaging = new FirebaseMessaging();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   MikutterMessageProvider _provider = new MikutterMessageProvider();
-  var _token = 'default';
 
   @override
   void initState() {
     super.initState();
     _provider.open(dbPath);
+    _messaging = new FirebaseMessaging();
     _messaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         var data = message['data'];
@@ -84,8 +76,6 @@ class _MyHomePageState extends State<MyHomePage> {
       onLaunch: (Map<String, dynamic> message) async {},
       onResume: (Map<String, dynamic> message) async {},
     );
-    _messaging.requestNotificationPermissions(
-        const IosNotificationSettings(sound: true, badge: true, alert: true));
     _messaging.getToken().then((String token) {
       setState(() {
         _token = token;
@@ -108,6 +98,25 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/settings');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -48,6 +48,7 @@ class SettingPage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   MikutterMessageProvider _provider = new MikutterMessageProvider();
+  List<MikutterMessage> _list = [];
 
   @override
   void initState() {
@@ -63,7 +64,6 @@ class _MyHomePageState extends State<MyHomePage> {
           url: data['url'],
         );
         _provider.insert(msg);
-        _provider.close();
         var androidPlatformChannelSpecifics = AndroidNotificationDetails(
             'default', 'Notification', 'mikuter fcm notification');
         var iOSPlatformChannelSpecifics = IOSNotificationDetails();
@@ -89,6 +89,13 @@ class _MyHomePageState extends State<MyHomePage> {
         initializationSettingsAndroid, initializationSettingsIos);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
+    _provider.open(dbPath).then((db) {
+      _provider.getMessages(100).then((messages) {
+        setState(() {
+          _list = messages.reversed.toList();
+        });
+      });
+    });
   }
 
   Future onSelectNotification(String payload) async {
@@ -96,6 +103,11 @@ class _MyHomePageState extends State<MyHomePage> {
       var data = json.decode(payload);
       var msg = MikutterMessage.fromMap(data);
     }
+  }
+
+  @override
+  void dispose() {
+    _provider.close();
   }
 
   @override
@@ -111,6 +123,19 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ],
+      ),
+      body: ListView.builder(
+        itemCount: _list.length,
+        itemBuilder: (BuildContext context, int index) {
+          var message = _list[index];
+          return ListTile(
+            title: Text(message.title),
+            subtitle: Text(message.body),
+            onTap: () {
+
+            },
+          );
+        },
       ),
     );
   }

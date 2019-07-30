@@ -27,6 +27,7 @@ dependencies:
   flutter_local_notifications: ^0.7.1
   fluttertoast: ^3.1.0
   sqflite: ^1.1.6
+  url_launcher: ^5.1.1
 
 dev_dependencies:
   flutter_test:

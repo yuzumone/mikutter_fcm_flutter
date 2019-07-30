@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 import 'model/mikutter_message.dart';
 import 'database/mikutter_message_provider.dart';
@@ -105,6 +106,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
+  }
+
   @override
   void dispose() {
     _provider.close();
@@ -132,7 +139,9 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text(message.title),
             subtitle: Text(message.body),
             onTap: () {
-
+              if (message.url != null) {
+                _launchURL(message.url);
+              }
             },
           );
         },
